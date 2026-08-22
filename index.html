@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ramanjeet Kaur — notebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F1620;
+    --ink-2:#151E2B;
+    --paper:#F1E9D8;
+    --paper-dim:#E7DEC9;
+    --rule: rgba(241,233,216,0.14);
+    --marigold:#E2A33B;
+    --teal:#3E8E8A;
+    --muted:#93A2B4;
+    --text:#EDE7D8;
+    --green:#7EC8A0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.55;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:var(--marigold);}
+
+  .wrap{max-width:840px; margin:0 auto; padding:64px 24px 120px;}
+
+  header.top{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:56px; flex-wrap:wrap; gap:12px;
+  }
+  header.top .file{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--muted);
+  }
+  header.top .kernel{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--green);
+    display:flex; align-items:center; gap:8px;
+  }
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--green); display:inline-block; box-shadow:0 0 8px var(--green);}
+
+  .cell{
+    display:grid;
+    grid-template-columns:76px 1fr;
+    gap:0 20px;
+    margin-bottom:6px;
+  }
+  .prompt{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--muted);
+    text-align:right;
+    padding-top:18px;
+    user-select:none;
+  }
+  .prompt.out{color:var(--teal);}
+  .cell-body.code{
+    background:var(--ink-2);
+    border:1px solid var(--rule);
+    border-left:3px solid var(--marigold);
+    border-radius:6px;
+    padding:16px 20px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    color:#B9C4D0;
+    margin-bottom:22px;
+  }
+  .cell-body.code .c{color:var(--muted);}
+  .cell-body.code .s{color:var(--green);}
+  .cell-body.code .k{color:var(--marigold);}
+
+  .cell-body.out{
+    padding:4px 4px 36px;
+  }
+
+  h1.name{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:clamp(32px, 6vw, 52px);
+    font-weight:700;
+    margin:0 0 6px;
+    color:var(--paper);
+    letter-spacing:-0.5px;
+  }
+  .role{color:var(--marigold); font-family:'IBM Plex Mono', monospace; font-size:15px; margin-bottom:4px;}
+  .meta{color:var(--muted); font-size:14px;}
+
+  h2.section{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    color:var(--teal);
+    text-transform:lowercase;
+    letter-spacing:0.5px;
+    margin:0 0 14px;
+  }
+  h2.section::before{content:"# "; color:var(--muted);}
+
+  p{color:var(--text); font-size:15.5px; margin:0 0 12px;}
+
+  .stack-grid{
+    display:flex; flex-wrap:wrap; gap:8px;
+  }
+  .chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--paper);
+    background:rgba(226,163,59,0.1);
+    border:1px solid rgba(226,163,59,0.35);
+    padding:5px 11px;
+    border-radius:4px;
+  }
+
+  .proj{
+    border-top:1px solid var(--rule);
+    padding:18px 0;
+  }
+  .proj:first-child{border-top:none; padding-top:0;}
+  .proj-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .proj-title{font-family:'IBM Plex Mono', monospace; font-size:16px; color:var(--paper); font-weight:600;}
+  .proj-status{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--green); border:1px solid rgba(126,200,160,0.4); padding:2px 8px; border-radius:20px; white-space:nowrap;}
+  .proj-desc{color:var(--muted); font-size:14.5px; margin-top:6px;}
+
+  .agent-card{
+    background:var(--ink-2);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:22px 24px;
+  }
+  .agent-card .proj-title{margin-bottom:6px;}
+  .agent-card p{color:var(--muted); font-size:14.5px;}
+
+  footer{
+    border-top:1px solid var(--rule);
+    margin-top:20px;
+    padding-top:24px;
+    display:flex; gap:18px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13.5px;
+  }
+
+  @media (max-width:560px){
+    .cell{grid-template-columns:44px 1fr; gap:0 12px;}
+    .prompt{font-size:11px; padding-top:14px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="file mono">notebook — ramanjeet_kaur.ipynb</div>
+    <div class="kernel"><span class="dot"></span>kernel: live</div>
+  </header>
+
+  <div class="cell">
+    <div class="prompt">In [1]:</div>
+    <div class="cell-body code"><span class="c"># load profile</span><br>print(profile)</div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[1]:</div>
+    <div class="cell-body out">
+      <h1 class="name">Ramanjeet Kaur</h1>
+      <div class="role">B.Tech CSE '24–'28 · ML Track Intern @ FlyRank</div>
+      <div class="meta">Based in Delhi · originally from Patiala, Punjab</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <div class="prompt">In [2]:</div>
+    <div class="cell-body code"><span class="c"># what I'm doing right now</span><br>print(about)</div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[2]:</div>
+    <div class="cell-body out">
+      <h2 class="section">about</h2>
+      <p>Third-year CSE student splitting time between coursework and an ML-track internship at FlyRank, where I work through applied assignments on real datasets and ship a project inside the FlyRank AI stack. In parallel, I build with a college team on a career-tech platform and compete in hackathons. I document the process — including the parts that don't work the first time.</p>
+    </div>
+  </div>
+
+  <div class="cell">
+    <div class="prompt">In [3]:</div>
+    <div class="cell-body code"><span class="c"># tools + stack</span><br>print(stack)</div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[3]:</div>
+    <div class="cell-body out">
+      <h2 class="section">stack</h2>
+      <div class="stack-grid">
+        <span class="chip">Python</span>
+        <span class="chip">Google Colab</span>
+        <span class="chip">Hugging Face</span>
+        <span class="chip">Pandas / NumPy</span>
+        <span class="chip">Git & GitHub</span>
+        <span class="chip">Scikit-learn</span>
+        <span class="chip">Prompt Engineering</span>
+        <span class="chip">Applied ML Workflows</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <div class="prompt">In [4]:</div>
+    <div class="cell-body code"><span class="c"># current builds</span><br>for p <span class="k">in</span> projects:<br>&nbsp;&nbsp;print(p)</div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[4]:</div>
+    <div class="cell-body out">
+      <h2 class="section">projects</h2>
+
+      <div class="proj">
+        <div class="proj-head">
+          <div class="proj-title">FlyRank ML Internship — Content Opportunity Scoring</div>
+          <div class="proj-status">in progress</div>
+        </div>
+        <div class="proj-desc">Working through the FlyRank ML track: structured Colab assignments on the internship-warehouse dataset, tracked and submitted through a public GitHub repo, feeding into a scoring-lane capstone project.</div>
+      </div>
+
+      <div class="proj">
+        <div class="proj-head">
+          <div class="proj-title">ProjectX (team ByteCode)</div>
+          <div class="proj-status">building</div>
+        </div>
+        <div class="proj-desc">A career/job-help platform built with a 4-person college team. Owning the ATS resume checker, resume–job description matching, and job-specific resume customization features.</div>
+      </div>
+
+      <div class="proj">
+        <div class="proj-head">
+          <div class="proj-title">Code Lens</div>
+          <div class="proj-status">shipped</div>
+        </div>
+        <div class="proj-desc">An AI-powered terminal coding assistant, built and documented as an academic project with a full technical report.</div>
+      </div>
+
+      <div class="proj">
+        <div class="proj-head">
+          <div class="proj-title">SAP Hackfest 2026</div>
+          <div class="proj-status">upcoming</div>
+        </div>
+        <div class="proj-desc">Competing in the North Region round at CGC Landran, building against the Resilient Supply Chains / Inclusive Workforce themes.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <div class="prompt">In [5]:</div>
+    <div class="cell-body code"><span class="c"># the capstone: ship a personal agent</span><br>agent.run()</div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[5]:</div>
+    <div class="cell-body out">
+      <div class="agent-card">
+        <div class="proj-title">Ask my agent</div>
+        <p>A small chat agent that knows my background, stack, and current projects — open <code class="mono">agent.html</code> alongside this notebook to talk to it directly.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>Delhi, India</span>
+    <span>·</span>
+    <span>B.Tech CSE, CGC Landran</span>
+    <span>·</span>
+    <span>ML Intern @ FlyRank</span>
+  </footer>
+
+</div>
+</body>
+</html>

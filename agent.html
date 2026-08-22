@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raman's Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F1620; --ink-2:#151E2B; --paper:#F1E9D8;
+    --rule: rgba(241,233,216,0.14);
+    --marigold:#E2A33B; --teal:#3E8E8A; --muted:#93A2B4;
+    --text:#EDE7D8; --green:#7EC8A0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh;
+    background:var(--ink); color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    display:flex; justify-content:center;
+  }
+  .wrap{max-width:680px; width:100%; padding:40px 20px 60px; display:flex; flex-direction:column; min-height:100vh;}
+  header{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:8px;}
+  .file{font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--muted);}
+  .kernel{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--green); display:flex; align-items:center; gap:8px;}
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green);}
+  h1{font-family:'IBM Plex Mono', monospace; font-size:24px; color:var(--paper); margin:18px 0 2px;}
+  .sub{color:var(--muted); font-size:14px; margin-bottom:24px;}
+
+  .chatlog{
+    flex:1;
+    display:flex; flex-direction:column; gap:14px;
+    margin-bottom:16px;
+    min-height:200px;
+  }
+  .msg{max-width:88%; padding:12px 15px; border-radius:8px; font-size:14.5px; line-height:1.55;}
+  .msg.user{align-self:flex-end; background:rgba(226,163,59,0.12); border:1px solid rgba(226,163,59,0.3); color:var(--paper);}
+  .msg.agent{align-self:flex-start; background:var(--ink-2); border:1px solid var(--rule); color:var(--text);}
+  .msg .tag{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--muted); display:block; margin-bottom:4px; text-transform:lowercase;}
+  .msg.agent .tag{color:var(--teal);}
+  .msg.user .tag{color:var(--marigold); text-align:right;}
+
+  .typing{align-self:flex-start; color:var(--muted); font-family:'IBM Plex Mono', monospace; font-size:13px;}
+
+  .suggestions{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;}
+  .sugg{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--paper);
+    background:rgba(62,142,138,0.1); border:1px solid rgba(62,142,138,0.35);
+    padding:6px 11px; border-radius:20px; cursor:pointer;
+  }
+  .sugg:hover{background:rgba(62,142,138,0.2);}
+
+  form{display:flex; gap:10px; border-top:1px solid var(--rule); padding-top:16px;}
+  input[type=text]{
+    flex:1; background:var(--ink-2); border:1px solid var(--rule); border-radius:6px;
+    padding:12px 14px; color:var(--text); font-family:'IBM Plex Sans', sans-serif; font-size:14.5px;
+  }
+  input[type=text]:focus{outline:2px solid var(--teal); outline-offset:1px;}
+  button{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--ink);
+    background:var(--marigold); border:none; border-radius:6px; padding:0 20px;
+    cursor:pointer; font-weight:600;
+  }
+  button:disabled{opacity:0.5; cursor:default;}
+  .err{color:#E08585; font-size:13px; font-family:'IBM Plex Mono', monospace; margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="file">agent.py — raman_agent</div>
+    <div class="kernel"><span class="dot"></span>kernel: live</div>
+  </header>
+  <h1>Raman's Agent</h1>
+  <div class="sub">Ask about my ML internship, projects, or stack — I'll answer as Raman's assistant.</div>
+
+  <div class="suggestions" id="suggestions">
+    <span class="sugg" data-q="What are you working on right now?">what are you working on?</span>
+    <span class="sugg" data-q="What's your tech stack?">your stack?</span>
+    <span class="sugg" data-q="Tell me about ProjectX.">tell me about ProjectX</span>
+  </div>
+
+  <div class="chatlog" id="chatlog"></div>
+
+  <form id="chatform">
+    <input type="text" id="input" placeholder="Ask something..." autocomplete="off" />
+    <button type="submit" id="send">Send</button>
+  </form>
+  <div class="err" id="err"></div>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `You are Raman's personal agent — a small AI assistant representing Ramanjeet Kaur on her portfolio site. Answer in first person as if you are speaking on Raman's behalf ("Raman is currently...", "her stack includes..."), warm and concise (2-4 sentences per answer), never invent facts beyond what's given below.
+
+Facts about Raman:
+- Ramanjeet Kaur, B.Tech Computer Science & Engineering student at Chandigarh Group of Colleges (CGC), Landran, Mohali. Session 2024-2028, currently 3rd year.
+- Based in Delhi (Uttam Nagar area), originally from Patiala, Punjab.
+- ML-track intern in the FlyRank AI Internship program. Works through structured assignments in Google Colab on the Hugging Face dataset FlyRank/internship-warehouse. Submits work via a public GitHub repo (flyrank-ml-internship). Chose the "Refresh / Content Opportunity Scoring" project lane for her capstone.
+- Stack: Python, Google Colab, Hugging Face, Pandas/NumPy, scikit-learn, Git & GitHub, applied ML workflows, prompt engineering.
+- Part of a college team called ByteCode building "ProjectX", a career/job-help platform. Raman owns the ATS resume checker, resume-to-job-description matching, and job-specific resume customization features.
+- Built "Code Lens", an AI-powered terminal coding assistant, as an academic project with a full written report.
+- Competing in SAP Hackfest 2026 (North Region round), hosted at CGC Landran, choosing between the Resilient Supply Chains and Inclusive Workforce themes.
+- Building a LinkedIn presence documenting her internship journey in a casual, beginner-authentic voice.
+
+If asked something outside these facts, say you don't have that detail yet and suggest connecting with Raman directly.`;
+
+const chatlog = document.getElementById('chatlog');
+const form = document.getElementById('chatform');
+const input = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const errBox = document.getElementById('err');
+let history = [];
+
+function addMessage(role, text){
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'user' : 'agent');
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.textContent = role === 'user' ? 'you' : 'raman\'s agent';
+  const body = document.createElement('div');
+  body.textContent = text;
+  div.appendChild(tag);
+  div.appendChild(body);
+  chatlog.appendChild(div);
+  chatlog.scrollTop = chatlog.scrollHeight;
+  return div;
+}
+
+async function sendMessage(text){
+  if(!text.trim()) return;
+  errBox.textContent = '';
+  addMessage('user', text);
+  history.push({role:'user', content:text});
+  input.value = '';
+  sendBtn.disabled = true;
+
+  const typingEl = document.createElement('div');
+  typingEl.className = 'typing';
+  typingEl.textContent = 'raman\'s agent is thinking...';
+  chatlog.appendChild(typingEl);
+  chatlog.scrollTop = chatlog.scrollHeight;
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: history
+      })
+    });
+    const data = await response.json();
+    typingEl.remove();
+    const textBlock = (data.content || []).find(b => b.type === 'text');
+    const reply = textBlock ? textBlock.text : "Sorry, I couldn't generate a reply just now.";
+    addMessage('agent', reply);
+    history.push({role:'assistant', content:reply});
+  }catch(e){
+    typingEl.remove();
+    errBox.textContent = 'Something went wrong reaching the agent. Try again.';
+  }finally{
+    sendBtn.disabled = false;
+  }
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  sendMessage(input.value);
+});
+
+document.querySelectorAll('.sugg').forEach(el => {
+  el.addEventListener('click', () => sendMessage(el.dataset.q));
+});
+
+addMessage('agent', "Hi — I'm Raman's agent. Ask me about her ML internship, her projects, or what she's building next.");
+</script>
+</body>
+</html>
