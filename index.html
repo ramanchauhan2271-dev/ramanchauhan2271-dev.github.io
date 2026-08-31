@@ -166,8 +166,13 @@
     <div class="prompt out">Out[1]:</div>
     <div class="cell-body out">
       <h1 class="name">Ramanjeet Kaur</h1>
+      <div class="role" style="color:var(--paper);font-size:16px;font-weight:600;margin-bottom:8px;">AI/ML Developer — building and shipping real AI products</div>
       <div class="role">B.Tech CSE '24–'28 · ML Track Intern @ FlyRank</div>
-      <div class="meta">Based in Delhi · originally from Patiala, Punjab</div>
+      <div class="meta" style="margin-bottom:14px;">Based in Delhi · originally from Patiala, Punjab</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="#opportunity-scorer" class="mono" style="font-size:13px;background:rgba(226,163,59,0.1);border:1px solid rgba(226,163,59,0.35);padding:6px 12px;border-radius:5px;text-decoration:none;">→ Try the live AI demo</a>
+        <a href="#ask-agent" class="mono" style="font-size:13px;background:rgba(62,142,138,0.12);border:1px solid rgba(62,142,138,0.4);padding:6px 12px;border-radius:5px;text-decoration:none;color:var(--teal);">→ Ask my agent</a>
+      </div>
     </div>
   </div>
 
@@ -218,7 +223,7 @@
           <div class="proj-title">FlyRank ML Internship — Content Opportunity Scoring</div>
           <div class="proj-status">in progress</div>
         </div>
-        <div class="proj-desc">Working through the FlyRank ML track: structured Colab assignments on the internship-warehouse dataset, tracked and submitted through a public GitHub repo, feeding into a scoring-lane capstone project.</div>
+        <div class="proj-desc"><b>Problem:</b> content teams waste time guessing which headlines are worth publishing. <b>Built:</b> a content opportunity scorer that rates a piece of content on its potential. <b>Tech:</b> a fine-tuned Hugging Face model, trained on the internship's dataset. <b>Result:</b> in progress — model is fine-tuned, benchmark results not measured yet; a rule-based version of the scoring logic is live and testable in the demo below.</div>
       </div>
 
       <div class="proj">
@@ -254,7 +259,7 @@
   <div class="cell">
     <div class="prompt out">Out[5]:</div>
     <div class="cell-body out">
-      <div class="agent-card">
+      <div class="agent-card" id="ask-agent">
         <div class="proj-title">Ask my agent</div>
         <p>A small chat agent that knows my background, stack, and current projects — open <code class="mono">agent.html</code> alongside this notebook to talk to it directly.</p>
       </div>
