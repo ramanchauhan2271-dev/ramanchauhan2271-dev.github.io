@@ -262,13 +262,111 @@
   </div>
 
   <footer>
-    <span>Delhi, India</span>
+    <span>Patiala,India</span>
     <span>·</span>
     <span>B.Tech CSE, CGC Landran</span>
     <span>·</span>
     <span>ML Intern @ FlyRank</span>
   </footer>
+<div class="cell">
+  <div class="prompt">In [6]:</div>
+  <div class="cell-body code"><span class="c"># make it do something: a live demo</span><br>opportunity_scorer.run()</div>
+</div>
 
+<div class="cell">
+  <div class="prompt out">Out[6]:</div>
+  <div class="cell-body out">
+    <div class="agent-card" id="opportunity-scorer">
+      <div class="proj-title">Content Opportunity Scorer</div>
+      <p style="color:var(--muted);margin-top:4px;">
+        A live, in-browser version of the scoring logic from my FlyRank ML internship
+        project (Refresh / Content Opportunity Scoring). Paste a headline in — it scores
+        it right here, no server involved.
+      </p>
+
+      <textarea id="scorer-input" rows="3" placeholder="Paste a headline or short piece of content..."
+        style="width:100%;box-sizing:border-box;margin-top:10px;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:0.95rem;background:var(--ink-2);color:var(--text);border:1px solid var(--rule);border-radius:6px;"></textarea>
+
+      <button id="scorer-btn"
+        style="margin-top:10px;padding:8px 20px;font-family:'IBM Plex Mono',monospace;font-size:0.95rem;background:var(--marigold);color:var(--ink);border:none;border-radius:6px;cursor:pointer;">
+        Score it
+      </button>
+
+      <div id="scorer-result" style="margin-top:16px;display:none;">
+        <div style="display:flex;align-items:baseline;gap:10px;">
+          <span id="score-number" style="font-size:2rem;font-weight:600;color:var(--teal);">0</span>
+          <span style="color:var(--muted);">/ 100 opportunity score</span>
+        </div>
+        <ul id="score-breakdown" style="margin-top:10px;padding-left:18px;font-size:0.9rem;color:var(--muted);line-height:1.6;"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  function scoreContent(text) {
+    const breakdown = [];
+    let score = 0;
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    const wordCount = words.length;
+
+    if (wordCount >= 6 && wordCount <= 20) {
+      score += 20;
+      breakdown.push("Good headline length (concise, scannable): +20");
+    } else if (wordCount > 20) {
+      score += 8;
+      breakdown.push("A bit long for a headline: +8");
+    } else {
+      breakdown.push("Too short to carry much signal: +0");
+    }
+
+    if (/\d/.test(text)) {
+      score += 20;
+      breakdown.push("Contains a number/data point (specificity): +20");
+    }
+    if (/\?|how|why|what|best|guide/i.test(text)) {
+      score += 20;
+      breakdown.push("Curiosity or intent hook (how/why/guide/?): +20");
+    }
+    if (/2025|2026|new|latest|update/i.test(text)) {
+      score += 20;
+      breakdown.push("Freshness cue (year/new/latest): +20");
+    }
+    if (/vs|compare|review|top|best/i.test(text)) {
+      score += 20;
+      breakdown.push("Comparison/decision intent keyword: +20");
+    }
+
+    score = Math.min(score, 100);
+    if (breakdown.length === 0) {
+      breakdown.push("No strong signals detected — try adding a number, a question, or a comparison word.");
+    }
+    return { score, breakdown };
+  }
+
+  document.getElementById("scorer-btn").addEventListener("click", function () {
+    const input = document.getElementById("scorer-input").value;
+    const resultBox = document.getElementById("scorer-result");
+    const scoreNumber = document.getElementById("score-number");
+    const list = document.getElementById("score-breakdown");
+
+    if (!input.trim()) {
+      alert("Paste in some text first.");
+      return;
+    }
+    const { score, breakdown } = scoreContent(input);
+    scoreNumber.textContent = score;
+    list.innerHTML = "";
+    breakdown.forEach(function (line) {
+      const li = document.createElement("li");
+      li.textContent = line;
+      list.appendChild(li);
+    });
+    resultBox.style.display = "block";
+  });
+})();
+</script>
 </div>
 </body>
 </html>
